@@ -1,7 +1,8 @@
 # potato-mashup
+
 A typescript mashup
 
-# Instructions
+## Instructions
 
 To build a docker image, run `npm run-script build`.
 
