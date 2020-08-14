@@ -11,5 +11,6 @@ WORKDIR /app
 RUN npm install
 # Set up production envrionment variables
 ENV TYPE=production
+ENV PORT=80
 # Start the run-prod script for the project
 CMD [ "npm", "run-script", "run-prod" ]
