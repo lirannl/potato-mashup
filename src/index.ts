@@ -1,6 +1,5 @@
 import Koa from 'koa';
 import appData from './appData';
-import { printThis } from './moduletest';
 const app = new Koa();
 let data: appData;
 
