@@ -1,16 +1,27 @@
-FROM node
-# Add node package files
-ADD package*.json /app/
-# Add the transpiled code into the container
-ADD ./build /app/code
-# Add static resources
-ADD ./res /app/res
-# Switch to the app's folder
+#stage 0 transpilation
+FROM node:current-alpine
 WORKDIR /app
-# Install dependencies
+COPY ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
+COPY package*.json ./
+COPY tsconfig.json .
 RUN npm install
+COPY ./src ./src
+RUN npx tsc
+
+#stage 1 js image
+FROM node:current-alpine
+WORKDIR /app
+COPY package*.json ./
+# Copy transpiled source
+COPY --from=0 /app/build ./code
+COPY ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
+# Install dependencies
+RUN npm install --production
+# Add static resources
+COPY ./res /app/res
 # Set up production envrionment variables
 ENV TYPE=production
 ENV PORT=80
+EXPOSE 80
 # Start the run-prod script for the project
 CMD [ "npm", "run-script", "run-prod" ]
