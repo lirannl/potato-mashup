@@ -5,7 +5,7 @@
   "scripts": {
     "run-prod": "node code/index.js",
     "start": "npx esm-ts-node src/index.ts",
-    "debug": "export $(cat dev.env | sed 's/#.*//g' | xargs) && node src/index.ts",
+    "debug": "export $(cat dev.env | sed 's/#.*//g' | xargs) && nodemon --exec \"npx esm-ts-node src/index.ts\"",
     "build": "npx tsc && docker build -t lirannl/potato-mashup .",
     "pack": "docker build -t lirannl/potato-mashup .",
     "transpile": "npx tsc"

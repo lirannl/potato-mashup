@@ -1,6 +1,6 @@
 #stage 0 transpilation
 FROM node:current-alpine
-WORKDIR /app
+WORKDIR /usr/transpile
 COPY ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
 COPY package*.json ./
 COPY tsconfig.json .
@@ -13,12 +13,12 @@ FROM node:current-alpine
 WORKDIR /app
 COPY package*.json ./
 # Copy transpiled source
-COPY --from=0 /app/build ./code
+COPY --from=0 /usr/transpile/build ./code
 COPY ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
 # Install dependencies
 RUN npm install --production
 # Add static resources
-COPY ./res /app/res
+COPY ./res ./res
 # Set up production envrionment variables
 ENV TYPE=production
 ENV PORT=80
