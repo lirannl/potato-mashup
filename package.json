@@ -5,7 +5,7 @@
   "scripts": {
     "run-prod": "node code/index.js",
     "start": "npx esm-ts-node src/index.ts",
-    "debug": "export $(cat dev.env | sed 's/#.*//g' | xargs) && nodemon --exec \"npx esm-ts-node src/index.ts\"",
+    "debug": "export $(cat dev.env | sed 's/#.*//g' | xargs) && npx ts-node-dev --respawn src/index.ts",
     "build": "npx tsc && docker build -t lirannl/potato-mashup .",
     "pack": "docker build -t lirannl/potato-mashup .",
     "transpile": "npx tsc"
@@ -22,11 +22,12 @@
     "pdf-creator-node": "^1.4.1"
   },
   "devDependencies": {
-    "esm": "^3.2.25",
-    "esm-ts-node": "^1.0.5",
     "@types/koa": "^2.11.3",
     "@types/node": "^14.0.27",
+    "esm": "^3.2.25",
+    "esm-ts-node": "^1.0.5",
     "ts-node": "^8.10.2",
+    "ts-node-dev": "^1.0.0-pre.58",
     "typescript": "^3.9.7"
   }
 }

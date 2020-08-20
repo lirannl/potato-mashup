@@ -1,5 +1,3 @@
-import { Url } from "url";
-
 export interface usPatentDoc {
   applicationType: string;
   documentID: string;
@@ -14,7 +12,7 @@ export interface usPatentDoc {
   inventor: string[];
   assignee: string[];
   title: string;
-  archiveURL: Url;
+  archiveURL: URL;
   pdfPath: string;
   year: number;
   version: number;

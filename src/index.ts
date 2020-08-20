@@ -1,6 +1,8 @@
 import Koa from "koa";
 import appData from "./interfaces/appData";
 import initData from "./initData";
+import getPerson from "./retrievers/fakePerson";
+import safePatentNumGen from "./patentNumberGenerator";
 const app = new Koa();
 let data: appData;
 
@@ -15,9 +17,8 @@ const ready = async () => {
 
 app.use(async (ctx) => {
   ctx.body = {
-    environment: process.env.TYPE,
-    euPatents: data.euPatents,
-    usPatents: data.usPatents,
+    patentNum: await safePatentNumGen(data),
+    person: await getPerson()
   };
 });
 
