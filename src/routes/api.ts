@@ -9,10 +9,11 @@ const api: IRoute = async (ctx) => {
     safePatentNumGen(ctx.data!).then((res) => ({ patent: res })),
     generatePerson().then((res) => ({ person: res })),
   ]);
+  const syncObject = {} // Initial object with synchronously obtained values
   // Merge the promises into one object
   ctx.body = resolvedPromises.reduce(
     (acc, curr) => Object.assign(acc, curr),
-    {}
+    syncObject
   );
 };
 
