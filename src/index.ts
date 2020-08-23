@@ -1,9 +1,10 @@
 import Koa from "koa";
+import Router from "koa-router";
 import appData from "./interfaces/appData";
 import initData from "./initData";
-import getPerson from "./retrievers/fakePerson";
-import safePatentNumGen from "./patentNumberGenerator";
+import api from "./routes/api";
 const app = new Koa();
+const router = new Router();
 let data: appData;
 
 const init = async () => {
@@ -15,11 +16,13 @@ const ready = async () => {
   console.log(`Now listening on port ${process.env.PORT || 8080}`);
 };
 
-app.use(async (ctx) => {
-  ctx.body = {
-    patentNum: await safePatentNumGen(data),
-    person: await getPerson()
-  };
-});
+router.post("/api", api);
+
+app
+  .use(async (ctx, next) => {
+    Object.assign(ctx, { data: data });
+    await next();
+  })
+  .use(router.routes());
 
 init().then(() => app.listen(process.env.PORT || 8080));

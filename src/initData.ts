@@ -9,8 +9,7 @@ const initData: (...params: any[]) => Promise<IappData> = async () => {
   ).data.response;
 
   const usPatents = usPatentBasicRes.numFound;
-  const euPatents = 25;
-  return { usPatents: usPatents, euPatents: euPatents };
+  return { usPatents: usPatents };
 };
 
 export default initData;
