@@ -13,7 +13,8 @@ WORKDIR /app
 COPY package*.json ./
 # Copy transpiled source
 COPY --from=0 /usr/transpile/build ./code
-COPY ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
+# Prevent redownloading of phantomjs by copying from the transpilation image
+COPY --from=0 ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
 # Install dependencies
 RUN npm install --production
 # Add static resources
