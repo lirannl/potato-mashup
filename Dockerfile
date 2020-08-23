@@ -1,7 +1,6 @@
 #stage 0 transpilation
 FROM node:current-alpine
 WORKDIR /usr/transpile
-COPY ./node_modules/phantomjs-prebuilt ./node_modules/phantomjs-prebuilt
 COPY package*.json ./
 COPY tsconfig.json .
 RUN npm install
