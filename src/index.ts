@@ -18,7 +18,7 @@ const init = async () => {
  * Run actions on the initalised app before starting it
  */
 const ready = async () => {
-  console.log(`Now listening on port ${port}`);
+  console.log(`Running on ${process.env.TYPE}.\nNow listening on port ${port}`);
 };
 
 router.post("/api", api);
