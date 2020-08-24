@@ -18,8 +18,33 @@ export interface usPatentDoc {
   version: number;
 }
 
+export interface usPatentParams {
+  applicationType?: string;
+  documentID?: string;
+  applicationNumber?: string;
+  documentType?: string;
+  patentNumber?: number;
+  publicationDate?: Date;
+  documentDate?: Date;
+  productionDate?: Date;
+  applicationDate?: Date;
+  applicant?: string | string[];
+  inventor?: string | string[];
+  assignee?: string | string[];
+  title?: string;
+  archiveURL?: URL;
+  pdfPath?: string;
+  year?: number;
+  version?: number;
+}
+
 export interface usPatentRes {
   numFound: number;
   start: number;
   docs: usPatentDoc[];
+}
+
+export interface safePatent {
+  result: number;
+  attemptsTaken: number;
 }

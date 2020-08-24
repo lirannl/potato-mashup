@@ -5,7 +5,7 @@
   "scripts": {
     "run-prod": "node code/index.js",
     "start": "npx esm-ts-node src/index.ts",
-    "debug": "export $(cat dev.env | sed 's/#.*//g' | xargs) && npx ts-node-dev --respawn src/index.ts",
+    "debug": "export $(cat dev.env | sed 's/#.*//g' | xargs) && npx ts-node-dev --respawn src/index.ts && clear",
     "build": "npx tsc && docker build -t lirannl/potato-mashup .",
     "pack": "docker build -t lirannl/potato-mashup .",
     "transpile": "npx tsc"
@@ -19,11 +19,13 @@
   "dependencies": {
     "axios": "^0.19.2",
     "koa": "^2.13.0",
+    "koa-bodyparser": "^4.3.0",
     "koa-router": "^9.4.0",
     "pdf-creator-node": "^1.4.1"
   },
   "devDependencies": {
     "@types/koa": "^2.11.3",
+    "@types/koa-bodyparser": "^4.3.0",
     "@types/koa-router": "^7.4.1",
     "@types/node": "^14.0.27",
     "esm": "^3.2.25",
