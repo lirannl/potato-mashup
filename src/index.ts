@@ -29,6 +29,10 @@ app
     await next();
   })
   .use(bodyParser())
+  .use(async (ctx, next) => {
+    console.log(`Recieved a ${ctx.request.method} request from ${ctx.request.ip}`);
+    await next();
+  })
   .use(router.routes());
 
 init().then(() => app.listen(port));

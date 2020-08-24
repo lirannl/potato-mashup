@@ -14,7 +14,11 @@ const api: IRoute = async (ctx) => {
   if (patents.length == 0)
     ctx.throw(400, "No patents found for the given parameters.");
   else {
-    const inventors = patents.reduce((acc, curr)=>acc.concat(curr.inventor), [] as string[]);
+    const inventors = patents.reduce(
+      (acc, curr) =>
+        acc.concat(curr.inventor.filter((name) => !acc.includes(name))), // Add any new inventor names that aren't already in the list
+      [] as string[]
+    );
     ctx.response.body = inventors;
   }
 };
