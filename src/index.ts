@@ -21,7 +21,12 @@ const ready = async () => {
   console.log(`Running on ${process.env.TYPE}.\nNow listening on port ${port}`);
 };
 
-router.post("/api", api);
+interface validAsync {
+  (ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, {}>>): Promise<void>
+
+}
+
+router.post("/api", api as validAsync);
 
 app
   .use(async (ctx, next) => {

@@ -31,6 +31,7 @@ export interface usPatentParams {
   applicant?: string | string[];
   inventor?: string | string[];
   assignee?: string | string[];
+  start?: number;
   title?: string;
   archiveURL?: URL;
   pdfPath?: string;
