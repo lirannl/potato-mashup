@@ -10,10 +10,10 @@ const Twitter = new Twit({
 });
 
 const getTweeter = async (name: string) => {
-    return (await Twitter.get("users/search", {
+    return ((await Twitter.get("users/search", {
      q: name, 
-     count: 5,  
-    })).data as TwitterUser[];
+     count: 1,  
+    })).data as TwitterUser[])[0];
 }
 
 export default getTweeter;

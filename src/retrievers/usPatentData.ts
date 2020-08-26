@@ -14,30 +14,34 @@ const singleReq = async (searchPatameters: usPatentParams) => {
   ).data.response) as usPatentRes;
 };
 
-/**
- * Get up to the first 2000 patents
- * @param searchParameters the search parameters to use for the lookup
- * @param patents
- */
 const recursivePatentRetriever: (
   searchParameters: usPatentParams,
-  patents: usPatentDoc[]
-) => Promise<usPatentDoc[]> = async (searchParameters, patents) => {
+  patents: usPatentDoc[],
+  maxPatents: number
+) => Promise<usPatentDoc[]> = async (searchParameters, patents, maxPatents) => {
   const newDocs = (await singleReq(searchParameters)).docs;
-  if (newDocs.length == 100 && (searchParameters.start || 0) < 600)
+  if (newDocs.length == 100 && (searchParameters.start || 0) < maxPatents)
     return await recursivePatentRetriever(
       Object.assign({}, searchParameters, {
-        start: (searchParameters.start || 0) + 100,
+        start: (searchParameters.start || 0) + newDocs.length, // Increment the start parameter
       } as usPatentParams),
-      patents.concat(newDocs)
+      patents.concat(newDocs),
+      maxPatents
     );
   return patents.concat(newDocs);
 };
 
+/**
+ * Get patents from the US patent office
+ * @param searchParameters the search parameters to use for the lookup
+ * @param maxPatents Fetch up until this number of patents is provided (600 by default)
+ */
 const getUSPatents: (
-  searchParameters: usPatentParams
-) => Promise<usPatentDoc[]> = async (searchParameters) => {
-  return await recursivePatentRetriever(searchParameters, []);
+  searchParameters: usPatentParams,
+  maxPatents?: number
+) => Promise<usPatentDoc[]> = async (searchParameters, maxPatents = 600) => {
+  
+  return await recursivePatentRetriever(searchParameters, [], maxPatents);
 };
 
 export default getUSPatents;
