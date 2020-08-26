@@ -56,7 +56,7 @@ const api: IRoute = async (ctx) => {
       `No json provided.\nYou must provide a JSON with search parameters like patentNum, title, or assignee.`
     );
   const params = ctx.request.body as usPatentParams;
-  const patents = await usPatentData(params, 1200);
+  const patents = await usPatentData(params, 1350);
   if (patents.length == 0)
     ctx.throw(400, "No patents found for the given parameters.");
   else {
