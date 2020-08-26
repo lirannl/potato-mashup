@@ -4,6 +4,7 @@ import appData from "./interfaces/appData";
 import initData from "./initData";
 import api from "./routes/api";
 import bodyParser from "koa-bodyparser";
+import serve from "koa-static";
 const app = new Koa();
 const router = new Router();
 const port = process.env.PORT || 8080;
@@ -23,7 +24,6 @@ const ready = async () => {
 
 interface validAsync {
   (ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, {}>>): Promise<void>
-
 }
 
 router.post("/api", api as validAsync);
@@ -38,6 +38,7 @@ app
     console.log(`Recieved a ${ctx.request.method} request from ${ctx.request.ip}`);
     await next();
   })
-  .use(router.routes());
+  .use(router.routes())
+  .use(serve("res"));
 
 init().then(() => app.listen(port));
