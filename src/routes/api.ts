@@ -60,7 +60,7 @@ const api: IRoute = async (ctx) => {
   if (patents.length == 0)
     ctx.throw(400, "No patents found for the given parameters.");
   else {
-    // Create an object caching the twitter users of the top 45 inventors
+    // Create an object caching the twitter users of the top inventors
     const tweeters: { [name: string]: TwitterUser | undefined } = await (
       await Promise.all(
         getTopInventors(patents, 100).map(
@@ -74,17 +74,19 @@ const api: IRoute = async (ctx) => {
     }, {});
     const response = (
       await Promise.all(
-        patents.map(async (patent) => {
-          const TweetingInventors = patent.inventor
-            .map((name) => tweeters[name])
-            .filter((el) => el) as TwitterUser[]; // Remove nulls
-          if (TweetingInventors.length == 0) return null;
-          const concepts = await getConcepts(patent.title);
-          if (!concepts) return null;
-          return { inventors: TweetingInventors, concepts: concepts };
-        })
+        patents
+          .slice(0, parseInt(process.env.MAX_WATSON_REQS || "200")) // Limit the amount of patents to reduce excessive IBM Watson usage
+          .map(async (patent) => {
+            const patentInventors = patent.inventor.map((name) => ({
+              name: name,
+              twitter_username: tweeters[name]?.screen_name,
+            }));
+            const concepts = await getConcepts(patent.title);
+            if (!concepts || concepts.length == 0) return null;
+            return { inventors: patentInventors, concepts: concepts };
+          })
       )
-    ).filter((element) => element!); // Remove nulls
+    ).filter((element) => element); // Remove nulls
     ctx.response.body = response;
   }
 };
