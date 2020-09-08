@@ -6,11 +6,11 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "@weknow/react-bubble-chart-d3": "^1.0.12",
     "purecss": "^2.0.3",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "react-tooltip": "^4.2.9"
   },
   "scripts": {
     "start": "REACT_APP_API_BASE_URL=http://localhost:5000 REACT_APP_DATA_PATH=mock react-scripts start",

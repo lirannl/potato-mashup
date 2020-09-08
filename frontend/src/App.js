@@ -1,5 +1,4 @@
 import React from "react";
-import BubbleChart from '@weknow/react-bubble-chart-d3';
 import "./App.css";
 
 /**
@@ -20,7 +19,27 @@ const MakeStateful = (init) => {
   };
 };
 
-const randomHex = () => Math.ceil(Math.random() * 128 + 128).toString(16);
+/**
+ * Takes a list and splits it into sublists
+ * @param {any[]} list The list to be split into sublists
+ * @param {number} pieces How long should the sublists be
+ */
+const generateSublists = (list, pieces = 2) => list.reduce((acc, curr, index) => {
+  if (index % pieces === 0) { // Push new sublist
+    acc.push([curr]);
+    return acc;
+  }
+  else { // Add to latest sublist
+    const currSublist = acc.pop().concat(curr);
+    acc.push(currSublist);
+    return acc;
+  }
+}, []);
+
+const randomHex = () => {
+  const strength = Math.ceil(Math.random() * 100 + 156);
+  return strength.toString(16);
+}
 const randomColour = () => `#${randomHex()}${randomHex()}${randomHex()}`;
 
 const retrieveData = async (params) => {
@@ -36,9 +55,21 @@ const retrieveData = async (params) => {
   return await response.json();
 };
 
+const expandSublist = (inventor) => <td key={inventor.name}><span className="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
+<span className="pure-menu-link" style={{ backgroundColor: randomColour() }}>{inventor.name}</span>
+<ul className="pure-menu-children">
+  {(inventor.twitter_username ? <li className="pure-menu-item">
+    <a href={`https://twitter.com/${inventor.twitter_username}`} className="pure-menu-link">{inventor.twitter_username}{' '}<img className="inline-image" alt="Twitter" src="twitter.svg" /></a>
+  </li> : null)}
+  {inventor.concepts.map(concept => <li key={`${inventor.name}.${concept}`} className="pure-menu-item">
+    <span className="pure-menu-link">{concept}</span>
+  </li>)}
+</ul>
+</span></td>;
+
 function App() {
   const text = MakeStateful("");
-  const response = MakeStateful({});
+  const response = MakeStateful([]);
   const submitForm = (event) => {
     event.preventDefault();
     retrieveData({ assignee: text.value }).then((result) => {
@@ -46,7 +77,6 @@ function App() {
     });
     text.value = "";
   };
-  const data = Object.entries(response.value).map(()=>null);
   return (
     <div className="App">
       <header className="App-header">
@@ -72,31 +102,10 @@ function App() {
           >
             Search
           </button>
-          {response.value !== "" ? <BubbleChart
-          graph= {{
-            zoom: 1.1,
-            offsetX: -0.05,
-            offsetY: -0.01,
-          }}
-          width={1000}
-          height={800}
-          padding={0} // optional value, number that set the padding between bubbles
-          showLegend={false}
-          valueFont={{
-            family: 'Arial',
-            size: 12,
-            color: '#fff',
-            weight: 'bold',
-          }}
-          labelFont={{
-            family: 'Arial',
-            size: 16,
-            color: '#fff',
-            weight: 'bold',
-          }}
-
-          /> : null}
         </form>
+        <table>
+          {generateSublists(response.value, 3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
+        </table>
       </header>
     </div>
   );
