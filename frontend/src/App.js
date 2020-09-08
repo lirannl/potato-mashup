@@ -56,23 +56,26 @@ const retrieveData = async (params) => {
 };
 
 const expandSublist = (inventor) => <td key={inventor.name}><span className="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
-<span className="pure-menu-link" style={{ backgroundColor: randomColour() }}>{inventor.name}</span>
-<ul className="pure-menu-children">
-  {(inventor.twitter_username ? <li className="pure-menu-item">
-    <a href={`https://twitter.com/${inventor.twitter_username}`} className="pure-menu-link">{inventor.twitter_username}{' '}<img className="inline-image" alt="Twitter" src="twitter.svg" /></a>
-  </li> : null)}
-  {inventor.concepts.map(concept => <li key={`${inventor.name}.${concept}`} className="pure-menu-item">
-    <span className="pure-menu-link">{concept}</span>
-  </li>)}
-</ul>
+  <span className="pure-menu-link" style={{ backgroundColor: randomColour() }}>{inventor.name}</span>
+  <ul className="pure-menu-children">
+    {(inventor.twitter_username ? <li className="pure-menu-item">
+      <a href={`https://twitter.com/${inventor.twitter_username}`} className="pure-menu-link">{inventor.twitter_username}{' '}<img className="inline-image" alt="Twitter" src="twitter.svg" /></a>
+    </li> : null)}
+    {inventor.concepts.map(concept => <li key={`${inventor.name}.${concept}`} className="pure-menu-item">
+      <span className="pure-menu-link">{concept}</span>
+    </li>)}
+  </ul>
 </span></td>;
 
 function App() {
   const text = MakeStateful("");
   const response = MakeStateful([]);
+  const loading = MakeStateful(false);
   const submitForm = (event) => {
     event.preventDefault();
+    loading.value = true;
     retrieveData({ assignee: text.value }).then((result) => {
+      loading.value = false;
       if (result) response.value = result;
     });
     text.value = "";
@@ -103,6 +106,7 @@ function App() {
             Search
           </button>
         </form>
+        <span className="loader" style={{visibility: loading.value ? "visible" : "hidden"}}></span>
         <table>
           {generateSublists(response.value, 3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
         </table>
