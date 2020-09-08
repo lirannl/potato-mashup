@@ -2,7 +2,7 @@ import Koa from "koa";
 import Router from "koa-router";
 import appData from "./interfaces/appData";
 import initData from "./initData";
-import api from "./routes/api";
+import api, { responseTransformer } from "./routes/api";
 import serve from "koa-static";
 const app = new Koa();
 const router = new Router();
@@ -31,7 +31,7 @@ router.get("/mock", async (ctx, next) => {
     await next();
   }
   else {
-    ctx.response.body = require("./build/response.json");
+    ctx.response.body = responseTransformer(require("./build/response.json"));
   }
 })
 

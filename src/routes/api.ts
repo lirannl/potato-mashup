@@ -51,7 +51,7 @@ const compareInventorsWithOccurrence = (
 
 /**
  * Transform the response into the right format.
- * @param response The response from Watson after having passed through the Twitter API and the US patent office
+ * @param response The response after having passed through all APIs
  */
 export const responseTransformer = (response: ({
   inventors: {
@@ -60,7 +60,20 @@ export const responseTransformer = (response: ({
   }[];
   concepts: string[];
 })[]) => {
-  return response.reduce((acc, curr)=>{return acc.concat(curr.concepts)},[] as string[]);
+  return response.reduce((acc, curr) => {
+    // Get the names of each inventor that is already in the accumulating list
+    const duplicateInventors = curr.inventors.filter(inventor => acc.map(item => item.name).includes(inventor.name));
+    // Transform the data into an association between inventors and the concepts they were involved in the invention of
+    const items = curr.inventors.map(inventor => ({ name: inventor.name, twitter_username: inventor.twitter_username, concepts: curr.concepts }));
+    const newItems = items.filter(item => !duplicateInventors.find(innerItem => innerItem.name == item.name));
+    for (const { name } of duplicateInventors) { // For each duplicate inventor
+      const existingConcepts = acc.find(item => item.name == name)!.concepts; // Get their existing concepts
+      acc.find(item => item.name == name)!.concepts = existingConcepts.concat(
+        curr.concepts.filter(concept => !existingConcepts.includes(concept)) // Add any new concepts which don't already exist in the list
+      );
+    }
+    return acc.concat(newItems); // Add new items to the association list
+  }, [] as { name: string, twitter_username?: string, concepts: string[] }[]);
 }
 
 const api: IRoute = async (ctx) => {
@@ -94,7 +107,7 @@ const api: IRoute = async (ctx) => {
           return { inventors: patentInventors, concepts: concepts };
         })
     );
-    ctx.response.body = responseTransformer(response.filter(res=>res).map(res=>res!));
+    ctx.response.body = responseTransformer(response.filter(res => res).map(res => res!));
   }
 };
 
