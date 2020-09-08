@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./App.css";
 
 /**
@@ -37,7 +37,7 @@ const generateSublists = (list, pieces = 2) => list.reduce((acc, curr, index) =>
 }, []);
 
 const randomHex = () => {
-  const strength = Math.ceil(Math.random() * 100 + 156);
+  const strength = Math.ceil(Math.random() * 50 + 180);
   return strength.toString(16);
 }
 const randomColour = () => `#${randomHex()}${randomHex()}${randomHex()}`;
