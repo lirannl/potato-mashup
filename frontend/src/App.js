@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 
 /**
@@ -42,11 +42,10 @@ const randomHex = () => {
 }
 const randomColour = () => `#${randomHex()}${randomHex()}${randomHex()}`;
 
-const retrieveData = async (params) => {
-  const url = `${process.env.REACT_APP_API_BASE_URL || ""}/${process.env.REACT_APP_DATA_PATH || "api"}`;
+const retrieveData = async (company) => {
+  const url = `${process.env.REACT_APP_API_BASE_URL || ""}/${process.env.REACT_APP_DATA_PATH || "api"}?assignee=${company}`;
   const response = await fetch(url, {
     method: "GET",
-    params,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
@@ -74,7 +73,7 @@ function App() {
   const submitForm = (event) => {
     event.preventDefault();
     loading.value = true;
-    retrieveData({ assignee: text.value }).then((result) => {
+    retrieveData(text.value).then((result) => {
       loading.value = false;
       if (result) response.value = result;
     });
@@ -107,7 +106,7 @@ function App() {
           </button>
         </form>
         <span className="loader" style={{visibility: loading.value ? "visible" : "hidden"}}></span>
-        <table>
+        <table style={{paddingBottom: "15vh"}}>
           {generateSublists(response.value, 3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
         </table>
       </header>
