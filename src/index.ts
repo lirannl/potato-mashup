@@ -3,7 +3,6 @@ import Router from "koa-router";
 import appData from "./interfaces/appData";
 import initData from "./initData";
 import api from "./routes/api";
-import bodyParser from "koa-bodyparser";
 import serve from "koa-static";
 const app = new Koa();
 const router = new Router();
@@ -26,14 +25,22 @@ interface validAsync {
   (ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, {}>>): Promise<void>
 }
 
-router.post("/api", api as validAsync);
+router.get("/api", api as validAsync);
+router.get("/mock", async (ctx, next) => {
+  if (process.env.TYPE != "development") {
+    await next();
+  }
+  else {
+    ctx.response.body = require("./build/response.json");
+  }
+})
 
 app
+  .use(require("@koa/cors")())
   .use(async (ctx, next) => {
     Object.assign(ctx, { data: data });
     await next();
   })
-  .use(bodyParser())
   .use(async (ctx, next) => {
     console.log(`Recieved a ${ctx.request.method} request from ${ctx.request.ip}`);
     await next();
