@@ -1,7 +1,7 @@
 /**
  * 
  * @param {string} company 
- * @returns {Promise<{status: number, ok: boolean, json: () => Promise<{name: string, twitter_username?: string, concepts: string[]}[]>}>} An array of inventors
+ * @returns {Promise<{status: number, ok: boolean, json: () => Promise<{name: string, twitter_username?: string, frequency?: number, concepts: string[]}[]>}>} An array of inventors
  */
 const retrieveData = async (company) => {
   const { protocol, hostname } = window.location;

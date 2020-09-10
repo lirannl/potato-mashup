@@ -36,11 +36,15 @@
   100% { transform: rotate(360deg); }
 }
 
+.align-items-start > * {
+  text-align: start;
+}
+
 .pure-menu-children .pure-menu-link {
   color: #3498db;
 }
 
-.pure-menu-children > li {
+.pure-menu-children > * {
   background-color: #222222;
   color: #f3f3f3;
 }

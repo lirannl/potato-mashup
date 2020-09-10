@@ -37,7 +37,11 @@ function App() {
     if (res.ok || res.status === 404) {
       const resultObj = res.status === 404 ? [] : await res.json();
       msg.value = InfoBlurb(resultObj.length, inputText);
-      response.value = resultObj;
+      response.value = resultObj.sort((a, b) => {
+        if (a.frequency === b.frequency) return 0;
+        if (a.frequency > b.frequency) return -1;
+        return 1;
+      });
     }
     else {
       if (res.status) msg.value = <p>The API returned a response code of {res.status}</p>;

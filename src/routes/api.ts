@@ -19,7 +19,7 @@ const getTopInventors = (patents: usPatentDoc[], maxInventors?: number) =>
     // Only take the top inventors as specified
     .slice(0, maxInventors)
     // Dispose of the frequency
-    .map(([inventor]) => inventor);
+    .map((inventor) => ({name: inventor[0], frequency: inventor[1]}));
 
 /**
  * Add the inventors from the given patent result to the names list
@@ -57,6 +57,7 @@ export const responseTransformer = (response: ({
   inventors: {
     name: string;
     twitter_username: string | undefined;
+    frequency: number | undefined;
   }[];
   concepts: string[];
 })[]) => {
@@ -64,7 +65,7 @@ export const responseTransformer = (response: ({
     // Get the names of each inventor that is already in the accumulating list
     const duplicateInventors = curr.inventors.filter(inventor => acc.map(item => item.name).includes(inventor.name));
     // Transform the data into an association between inventors and the concepts they were involved in the invention of
-    const items = curr.inventors.map(inventor => ({ name: inventor.name, twitter_username: inventor.twitter_username, concepts: curr.concepts }));
+    const items = curr.inventors.map(inventor => ({ name: inventor.name, twitter_username: inventor.twitter_username, frequency: inventor.frequency, concepts: curr.concepts }));
     const newItems = items.filter(item => !duplicateInventors.find(innerItem => innerItem.name == item.name));
     for (const { name } of duplicateInventors) { // For each duplicate inventor
       const existingConcepts = acc.find(item => item.name == name)!.concepts; // Get their existing concepts
@@ -73,7 +74,7 @@ export const responseTransformer = (response: ({
       );
     }
     return acc.concat(newItems); // Add new items to the association list
-  }, [] as { name: string, twitter_username?: string, concepts: string[] }[]);
+  }, [] as { name: string, twitter_username?: string, frequency?: number, concepts: string[] }[]);
 }
 
 const api: IRoute = async (ctx) => {
@@ -82,11 +83,12 @@ const api: IRoute = async (ctx) => {
   if (patents.length == 0)
     ctx.throw(404, "No patents found for the given parameters.");
   else {
+    const topInventors = getTopInventors(patents);
     // Create an object caching the twitter users of the top inventors
     const tweeters: { [name: string]: TwitterUser | undefined } = (
       await Promise.all(
-        getTopInventors(patents, 200).map(
-          async (inventor) => [inventor, await getTweeter(inventor)] as [string, TwitterUser]
+        topInventors.slice(0, 300).map(
+          async (inventor) => [inventor.name, await getTweeter(inventor.name)] as [string, TwitterUser]
         )
       )
     ).reduce((acc, curr) => {
@@ -101,6 +103,7 @@ const api: IRoute = async (ctx) => {
           const patentInventors = patent.inventor.map((name) => ({
             name: name,
             twitter_username: tweeters[name]?.screen_name,
+            frequency: topInventors.find((inventor)=>inventor.name == name)?.frequency
           }));
           const concepts = (await getConcepts(patent.title))?.map(concept => concept.text!);
           if (!concepts || concepts.length == 0) return null;

@@ -29,7 +29,7 @@ router
       await next();
     }
     else {
-      ctx.response.body = responseTransformer(require("./build/response.json"));
+      ctx.response.body = require("./build/response.json");
     }
   });
 
