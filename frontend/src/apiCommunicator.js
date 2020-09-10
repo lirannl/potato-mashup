@@ -1,6 +1,6 @@
 /**
  * 
- * @param {*} company 
+ * @param {string} company 
  * @returns {Promise<{status: number, ok: boolean, json: () => Promise<{name: string, twitter_username?: string, concepts: string[]}[]>}>} An array of inventors
  */
 const retrieveData = async (company) => {

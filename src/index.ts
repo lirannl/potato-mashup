@@ -1,16 +1,12 @@
 import Koa from "koa";
 import Router from "koa-router";
-import appData from "./interfaces/appData";
-import initData from "./initData";
 import api, { responseTransformer } from "./routes/api";
 import serve from "koa-static";
 const app = new Koa();
 const router = new Router();
 const port = process.env.PORT || 8080;
-let data: appData;
 
 const init = async () => {
-  data = await initData();
   await ready();
 };
 
@@ -25,27 +21,25 @@ interface validAsync {
   (ctx: Koa.ParameterizedContext<any, Router.IRouterParamContext<any, {}>>): Promise<void>
 }
 
-router.get("/api", api as validAsync);
-router.get("/mock", async (ctx, next) => {
-  if (process.env.TYPE != "development") {
-    await next();
-  }
-  else {
-    ctx.response.body = responseTransformer(require("./build/response.json"));
-  }
-})
+router
+  .get("/api", api as validAsync)
+  // Mock data route - on development mode only
+  .get("/mock", async (ctx, next) => {
+    if (process.env.TYPE != "development") {
+      await next();
+    }
+    else {
+      ctx.response.body = responseTransformer(require("./build/response.json"));
+    }
+  });
 
 app
   .use(require("@koa/cors")())
-  .use(async (ctx, next) => {
-    Object.assign(ctx, { data: data });
-    await next();
-  })
   .use(async (ctx, next) => {
     console.log(`Recieved a ${ctx.request.method} request from ${ctx.request.ip}`);
     await next();
   })
   .use(router.routes())
-  .use(serve("res"));
+  .use(() => { if (process.env.TYPE != "development") return serve("res")}); // In production, resort to statically serving the "res" folder
 
 init().then(() => app.listen(port));

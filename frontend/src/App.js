@@ -28,15 +28,15 @@ function App() {
   const msg = MakeStateful(<React.Fragment />);
   const submitForm = async (event) => {
     event.preventDefault();
-    const text = event.target[0].value;
-    event.target[0].value = "";
-    if (text === "") return alert("Please enter a name."); // Don't try to send empty queries
+    const inputText = event.target[0].value;
+    event.target[0].value = ""; // Clear the input textbox
+    if (inputText === "") return alert("Please enter a name."); // Don't try to send empty queries
     loading.value = true;
-    const res = await apiCommunicator(text).catch(() => { msg.value = <p>Can't contact the API.</p>; return { ok: false } });
+    const res = await apiCommunicator(inputText).catch(() => { msg.value = <p>Can't contact the API.</p>; return { ok: false } });
     loading.value = false;
     if (res.ok || res.status === 404) {
       const resultObj = res.status === 404 ? [] : await res.json();
-      msg.value = InfoBlurb(resultObj.length, text);
+      msg.value = InfoBlurb(resultObj.length, inputText);
       response.value = resultObj;
     }
     else {
