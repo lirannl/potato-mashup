@@ -36,6 +36,7 @@ const usPatentData: (
   maxPatents?: number
 ) => Promise<usPatentDoc[]> = async (searchParameters, maxPatents) => {
   const FirstPatents = await singleReq(searchParameters);
+  if (FirstPatents.numFound == 0) return []; // Return an empty array when there are 0 patents
   const ReqSize = FirstPatents.docs.length;
   const startPoints = recursiveStartPointsBuilder(
     !maxPatents || maxPatents > FirstPatents.numFound // If there's no defined maximum, or if there are less results than the maximum

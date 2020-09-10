@@ -44,14 +44,13 @@ const randomColour = () => `#${randomHex()}${randomHex()}${randomHex()}`;
 
 const retrieveData = async (company) => {
   const url = `${process.env.REACT_APP_API_BASE_URL || ""}/${process.env.REACT_APP_DATA_PATH || "api"}?assignee=${company}`;
-  const response = await fetch(url, {
+  return await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
   });
-  return await response.json();
 };
 
 const expandSublist = (inventor) => <td key={inventor.name}><span className="pure-menu-item pure-menu-has-children pure-menu-allow-hover">
@@ -85,12 +84,22 @@ function App() {
   const resultQueryTerm = MakeStateful("");
   const response = MakeStateful([]);
   const loading = MakeStateful(false);
-  const submitForm = (event) => {
+  const msg = MakeStateful(<React.Fragment />);
+  const submitForm = async (event) => {
     event.preventDefault();
     loading.value = true;
-    retrieveData(text.value).then((result) => {
+    retrieveData(text.value).then(async (result) => {
       loading.value = false;
-      if (result) response.value = result;
+      if (result.ok) {
+        const resultObj = await result.json();
+        response.value = resultObj;
+        msg.value = InfoBlurb(resultObj.length, resultQueryTerm.value);
+      }
+      else {
+        response.value = [];
+        if (result.status === 404) msg.value = <p>No results were returned for assignee "{resultQueryTerm.value}"</p>;
+        else msg.value = <p>The API returned a response code of {result.status}</p>;
+      }
     });
     resultQueryTerm.value = text.value;
     text.value = "";
@@ -100,9 +109,7 @@ function App() {
       <header className="App-header">
         <form
           className="pure-form"
-          onSubmit={(event) => {
-            submitForm(event);
-          }}
+          onSubmit={submitForm}
         >
           <input
             type="text"
@@ -114,17 +121,15 @@ function App() {
           />
           <button
             label="Search"
-            onClick={(event) => {
-              submitForm(event, { assignee: text.value });
-            }}
+            onClick={submitForm}
           >
             Search
           </button>
         </form>
         {loading.value ? <span className="loader"></span> : InfoBlurb(response.value.length, resultQueryTerm.value)}
-        <table style={{ paddingBottom: "15vh" }}>
+        <table style={{ paddingBottom: "15vh" }}><tbody>
           {generateSublists(response.value, /* Number of columns */3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
-        </table>
+        </tbody></table>
       </header>
     </div>
   );

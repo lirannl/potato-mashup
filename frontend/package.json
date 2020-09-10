@@ -13,7 +13,7 @@
     "react-tooltip": "^4.2.9"
   },
   "scripts": {
-    "start": "REACT_APP_API_BASE_URL=http://localhost:5000 REACT_APP_DATA_PATH=mock react-scripts start",
+    "start": "REACT_APP_API_BASE_URL=http://localhost:5000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
