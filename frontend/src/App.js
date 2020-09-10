@@ -121,8 +121,7 @@ function App() {
             Search
           </button>
         </form>
-        {loading.value ? <span className="loader"></span> : null}
-        {InfoBlurb(response.value.length, resultQueryTerm.value)}
+        {loading.value ? <span className="loader"></span> : InfoBlurb(response.value.length, resultQueryTerm.value)}
         <table style={{ paddingBottom: "15vh" }}>
           {generateSublists(response.value, /* Number of columns */3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
         </table>
