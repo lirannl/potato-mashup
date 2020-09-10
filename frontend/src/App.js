@@ -66,8 +66,23 @@ const expandSublist = (inventor) => <td key={inventor.name}><span className="pur
   </ul>
 </span></td>;
 
+/**
+ * Generate an info blurb for the given details
+ * @param {number} resultsNum The number of results returned
+ * @param {string} companyName The name of the company
+ */
+const InfoBlurb = (resultsNum, companyName) => {
+  if (companyName === "") return null;
+  if (resultsNum === 0) return <p>No results were returned for assignee "{companyName}"</p>;
+  return <React.Fragment>
+    <h1>Inventors working for {companyName}</h1>
+    <p>Hover over an inventor's name to see what concepts were involved in their inventions, and (if they have one), what's their Twitter account.</p>
+  </React.Fragment>
+}
+
 function App() {
   const text = MakeStateful("");
+  const resultQueryTerm = MakeStateful("");
   const response = MakeStateful([]);
   const loading = MakeStateful(false);
   const submitForm = (event) => {
@@ -77,6 +92,7 @@ function App() {
       loading.value = false;
       if (result) response.value = result;
     });
+    resultQueryTerm.value = text.value;
     text.value = "";
   };
   return (
@@ -105,9 +121,10 @@ function App() {
             Search
           </button>
         </form>
-        <span className="loader" style={{visibility: loading.value ? "visible" : "hidden"}}></span>
-        <table style={{paddingBottom: "15vh"}}>
-          {generateSublists(response.value, 3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
+        {loading.value ? <span className="loader"></span> : null}
+        {InfoBlurb(response.value.length, resultQueryTerm.value)}
+        <table style={{ paddingBottom: "15vh" }}>
+          {generateSublists(response.value, /* Number of columns */3).map((sublist, index) => <tr key={index}>{sublist.map(expandSublist)}</tr>)}
         </table>
       </header>
     </div>
