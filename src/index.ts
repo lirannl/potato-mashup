@@ -40,6 +40,6 @@ app
     await next();
   })
   .use(router.routes())
-  .use(() => { if (process.env.TYPE != "development") return serve("res")}); // In production, resort to statically serving the "res" folder
+  .use(serve("res")); // In resort to statically serving the "res" folder (which only exists in production)
 
 init().then(() => app.listen(port));
