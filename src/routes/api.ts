@@ -8,16 +8,16 @@ import getConcepts from "../retrievers/conceptExtractor";
 /**
  * Takes patent responses and puts the most frequent inventors into an array. Up to 45 by default
  * @param patents Array of patent responses
- * @param maxInventors The maximum number of inventors. 0 (or less) to return all (sorted).
+ * @param maxInventors The maximum number of inventors. If not supplied, all inventors will be returned.
  */
-const getTopInventors = (patents: usPatentDoc[], maxInventors: number = 45) =>
+const getTopInventors = (patents: usPatentDoc[], maxInventors?: number) =>
   Object.entries(
     patents.reduce(accumulateInventors, []).reduce(addOccurrence, {})
   )
     // Sort the list based on the frequency at which inventors appear in the list
     .sort(compareInventorsWithOccurrence)
-    // Only take the top 45 inventors
-    .slice(0, maxInventors > 0 ? maxInventors : undefined)
+    // Only take the top inventors as specified
+    .slice(0, maxInventors)
     // Dispose of the frequency
     .map(([inventor]) => inventor);
 
@@ -85,7 +85,7 @@ const api: IRoute = async (ctx) => {
     // Create an object caching the twitter users of the top inventors
     const tweeters: { [name: string]: TwitterUser | undefined } = (
       await Promise.all(
-        getTopInventors(patents, 100).map(
+        getTopInventors(patents, 200).map(
           async (inventor) => [inventor, await getTweeter(inventor)] as [string, TwitterUser]
         )
       )
