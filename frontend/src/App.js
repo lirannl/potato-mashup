@@ -23,45 +23,41 @@ const MakeStateful = (init) => {
 };
 
 function App() {
-  const text = MakeStateful("");
-  const resultQueryTerm = MakeStateful("");
   const response = MakeStateful([]);
   const loading = MakeStateful(false);
   const msg = MakeStateful(<React.Fragment />);
   const submitForm = async (event) => {
     event.preventDefault();
-    if (text.value === "") return alert("Please enter a name."); // Don't try to send empty queries
+    const text = event.target[0].value;
+    event.target[0].value = "";
+    if (text === "") return alert("Please enter a name."); // Don't try to send empty queries
     loading.value = true;
-    const res = await apiCommunicator(text.value).catch(()=>{msg.value = <p>Can't contact the API.</p>; return {ok: false} });
+    const res = await apiCommunicator(text).catch(() => { msg.value = <p>Can't contact the API.</p>; return { ok: false } });
     loading.value = false;
     if (res.ok || res.status === 404) {
       const resultObj = res.status === 404 ? [] : await res.json();
+      msg.value = InfoBlurb(resultObj.length, text);
       response.value = resultObj;
-      msg.value = InfoBlurb(resultObj.length, resultQueryTerm.value);
     }
     else {
-      response.value = [];
       if (res.status) msg.value = <p>The API returned a response code of {res.status}</p>;
+      response.value = [];
     }
-    resultQueryTerm.value = text.value;
-    text.value = "";
   };
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Potato-Mashup <img src="logo.png" alt="logo"/></h1>
+        <h1>Potato-Mashup <img src="logo.png" alt="logo" /></h1>
         <form className="pure-form" onSubmit={submitForm}>
-          <input type="text" placeholder="Name of company" value={text.value}
-            onChange={(event) => {
-              text.value = event.target.value;
-            }}
-          />
+          <input type="text" placeholder="Name of company" />
           <button className="pure-button pure-button-primary" label="Search" value="submit">
             Search
           </button>
         </form>
         {loading.value ? <span className="loader"></span> : msg.value}
-        <div className="pure-g pure-menu-horizontal" style={{width:"95vw", paddingBottom: "30vh"}}>{response.value.map(expandDataItem)}</div>
+        <div className="pure-g pure-menu-horizontal" style={{ width: "95vw", paddingBottom: "30vh" }}>
+          {response.value.map(expandDataItem)}
+        </div>
       </header>
     </div>
   );
