@@ -12,7 +12,7 @@ const expandResultItem = (inventor) => <div key={inventor.name} className="pure-
       <a href={`https://twitter.com/${inventor.twitter_username}`} className="pure-menu-link">{`${inventor.twitter_username} `}<img className="inline-image" alt="Twitter" src="twitter.svg" /></a>
     </li> : null)}
     {inventor.concepts.map(concept => <li key={`${inventor.name}.${concept}`} className="pure-menu-item">
-      <span className="pure-menu-link">{concept}</span>
+      <span className="pure-menu-item pure-menu-disabled enabled">{concept}</span>
     </li>)}
   </ul>
 </div>;

@@ -36,6 +36,19 @@
   100% { transform: rotate(360deg); }
 }
 
-.pure-menu-link {
+.pure-menu-children .pure-menu-link {
+  color: #3498db;
+}
+
+.pure-menu-children > li {
+  background-color: #222222;
+  color: #f3f3f3;
+}
+
+.pure-menu-has-children > .pure-menu-link {
   color: #222222;
+}
+
+.enabled {
+  opacity: 1;
 }
