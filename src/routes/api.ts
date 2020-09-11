@@ -79,7 +79,7 @@ export const responseTransformer = (response: ({
 
 const api: IRoute = async (ctx) => {
   const params = ctx.request.query as usPatentParams;
-  const patents = await usPatentData(params, 1200); // Retrieve up to 1200 patents
+  const patents = await usPatentData(params);
   if (patents.length == 0)
     ctx.throw(404, "No patents found for the given parameters.");
   else {
