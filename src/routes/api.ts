@@ -19,7 +19,7 @@ const getTopInventors = (patents: usPatentDoc[], maxInventors?: number) =>
     // Only take the top inventors as specified
     .slice(0, maxInventors)
     // Dispose of the frequency
-    .map((inventor) => ({name: inventor[0], frequency: inventor[1]}));
+    .map((inventor) => ({ name: inventor[0], frequency: inventor[1] }));
 
 /**
  * Add the inventors from the given patent result to the names list
@@ -79,38 +79,53 @@ export const responseTransformer = (response: ({
 
 const api: IRoute = async (ctx) => {
   const params = ctx.request.query as usPatentParams;
-  const patents = await usPatentData(params);
+  if (Object.keys(params).length == 0) {
+    ctx.response.status = 400;
+    ctx.response.body = "Received an empty request";
+    return;
+  }
+  const patents = await usPatentData({assignee: params.assignee});
   if (patents.length == 0)
     ctx.throw(404, "No patents found for the given parameters.");
   else {
     const topInventors = getTopInventors(patents);
     // Create an object caching the twitter users of the top inventors
-    const tweeters: { [name: string]: TwitterUser | undefined } = (
-      await Promise.all(
-        topInventors.slice(0, 300).map(
-          async (inventor) => [inventor.name, await getTweeter(inventor.name)] as [string, TwitterUser]
+    try {
+      const tweeters: { [name: string]: TwitterUser | undefined } = (
+        await Promise.all(
+          topInventors.slice(0, 300).map(
+            async (inventor) => [inventor.name, await getTweeter(inventor.name)] as [string, TwitterUser]
+          )
         )
-      )
-    ).reduce((acc, curr) => {
-      if (!curr[1])
-        return acc;
-      return Object.assign(acc, { [curr[0]]: curr[1] });
-    }, {});
-    const response = await Promise.all(
-      patents
-        .slice(0, parseInt(process.env.MAX_WATSON_REQS || "200")) // Limit the amount of patents to reduce excessive IBM Watson usage
-        .map(async (patent) => {
-          const patentInventors = patent.inventor.map((name) => ({
-            name: name,
-            twitter_username: tweeters[name]?.screen_name,
-            frequency: topInventors.find((inventor)=>inventor.name == name)?.frequency
-          }));
-          const concepts = (await getConcepts(patent.title))?.map(concept => concept.text!);
-          if (!concepts || concepts.length == 0) return null;
-          return { inventors: patentInventors, concepts: concepts };
-        })
-    );
-    ctx.response.body = responseTransformer(response.filter(res => res).map(res => res!));
+      ).reduce((acc, curr) => {
+        if (!curr[1])
+          return acc;
+        return Object.assign(acc, { [curr[0]]: curr[1] });
+      }, {});
+      const response = await Promise.all(
+        patents
+          .slice(0, parseInt(process.env.MAX_WATSON_REQS || "200")) // Limit the amount of patents to reduce excessive IBM Watson usage
+          .map(async (patent) => {
+            const patentInventors = patent.inventor.map((name) => ({
+              name: name,
+              twitter_username: tweeters[name]?.screen_name,
+              frequency: topInventors.find((inventor) => inventor.name == name)?.frequency
+            }));
+            const concepts = (await getConcepts(patent.title))?.map(concept => concept.text!);
+            if (!concepts) throw new Error("Watson failed.");
+            if (concepts.length == 0) return null;
+            return { inventors: patentInventors, concepts: concepts };
+          })
+      );
+      ctx.response.body = responseTransformer(response.filter(res => res).map(res => res!));
+    }
+    catch (e) {
+      if (e.twitterReply) {
+        ctx.response.status = 500;
+        ctx.response.body = e.twitterReply;
+      }
+      else ctx.throw(500, JSON.stringify(e.message));
+    }
   }
 };
 
