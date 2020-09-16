@@ -2,10 +2,10 @@ import React from "react";
 
 /**
  * Generate an info blurb for the given details
- * @param {number} resultsNum The number of results returned
- * @param {string} companyName The name of the company
+ * @param resultsNum The number of results returned
+ * @param companyName The name of the company
  */
-const InfoBlurb = (resultsNum, companyName) => {
+const InfoBlurb = (resultsNum: number, companyName: string) => {
     if (companyName === "") return null;
     if (resultsNum === 0) return <p>No results were returned for assignee "{companyName}"</p>;
     return <React.Fragment>

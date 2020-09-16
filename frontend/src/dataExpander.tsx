@@ -3,10 +3,10 @@ import randomColour from "./colourGen";
 
 /**
  * Pluralises a given word
- * @param {number} num The number based on which to pluralise
- * @param {string} word
+ * @param num The number based on which to pluralise
+ * @param word
  */
-const pluralise = (num, word) => {
+const pluralise = (num: number, word: string) => {
   if (num === 1) return word;
   return `${word}s`;
 }
@@ -15,7 +15,7 @@ const pluralise = (num, word) => {
  * Expands a data item from the result to a react component
  * @param {{name: string, twitter_username?: string, frequency?: number, concepts: string[]}} inventor
  */
-const expandResultItem = (inventor) => <div key={inventor.name} className="pure-menu-item pure-menu-has-children pure-menu-allow-hover pure-u-1 pure-u-md-1-4">
+const expandResultItem = (inventor: {name: string, twitter_username?: string, frequency: number, concepts: string[]}) => <div key={inventor.name} className="pure-menu-item pure-menu-has-children pure-menu-allow-hover pure-u-1 pure-u-md-1-4">
   <span className="pure-menu-link" style={{ backgroundColor: randomColour() }}>{inventor.name}</span>
   <ul className="pure-menu-children" style={{ width: "fit-content" }}>
     {(inventor.twitter_username ? <li className="pure-menu-item">
